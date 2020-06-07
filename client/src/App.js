@@ -9,6 +9,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableCell from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
 import { withStyles } from "@material-ui/core/styles";
+import bodyParser from "body-parser";
 
 const styles = (theme) => ({
   root: {
@@ -21,34 +22,23 @@ const styles = (theme) => ({
   },
 });
 
-const customers = [
-  {
-    id: 1,
-    image: "https://placeimg.com/64/64/1",
-    name: "Jamie",
-    birthday: "921015",
-    gender: "male",
-    job: "traveler",
-  },
-  {
-    id: 2,
-    image: "https://placeimg.com/64/64/2",
-    name: "Sunny",
-    birthday: "911010",
-    gender: "female",
-    job: "traveler",
-  },
-  {
-    id: 3,
-    image: "https://placeimg.com/64/64/3",
-    name: "Jamie",
-    birthday: "921015",
-    gender: "male",
-    job: "traveler",
-  },
-];
-
 class App extends React.Component {
+  state = {
+    customers: "",
+  };
+
+  componentDidMount() {
+    this.callApi()
+      .then((res) => this.setState({ customers: res }))
+      .catch((err) => console.log(err));
+  }
+
+  callApi = async () => {
+    const response = await fetch("/api/customers");
+    const body = await response.json();
+    return body;
+  };
+
   render() {
     const { classes } = this.props;
     return (
@@ -65,19 +55,21 @@ class App extends React.Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {customers.map((c) => {
-              return (
-                <Customer
-                  key={c.id}
-                  id={c.id}
-                  image={c.image}
-                  name={c.name}
-                  birthday={c.birthday}
-                  gender={c.gender}
-                  job={c.job}
-                />
-              );
-            })}
+            {this.state.customers
+              ? this.state.customers.map((c) => {
+                  return (
+                    <Customer
+                      key={c.id}
+                      id={c.id}
+                      image={c.image}
+                      name={c.name}
+                      birthday={c.birthday}
+                      gender={c.gender}
+                      job={c.job}
+                    />
+                  );
+                })
+              : "데이터를 가져오는 중 입니다.!"}
           </TableBody>
         </Table>
       </Paper>
